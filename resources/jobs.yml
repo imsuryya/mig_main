@@ -1,0 +1,63 @@
+# Lakeflow Jobs for the Migration Platform.
+# These wrap Lakebridge CLI calls as job tasks so Phase 1/2 steps run on a
+# schedule/trigger instead of by hand.
+
+resources:
+  jobs:
+    ingest_and_profile:
+      name: migration_platform_ingest_and_profile
+      tasks:
+        - task_key: stage_to_volume
+          notebook_task:
+            notebook_path: ../src/jobs/stage_to_volume.py
+        - task_key: run_analyzer
+          depends_on:
+            - task_key: stage_to_volume
+          notebook_task:
+            notebook_path: ../src/jobs/run_lakebridge_analyzer.py
+        - task_key: write_source_objects
+          depends_on:
+            - task_key: run_analyzer
+          notebook_task:
+            notebook_path: ../src/jobs/write_source_objects.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+
+    transpile:
+      name: migration_platform_transpile
+      tasks:
+        - task_key: lakebridge_transpile
+          notebook_task:
+            notebook_path: ../src/jobs/run_lakebridge_transpile.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+        - task_key: ai_assist_incomplete
+          depends_on:
+            - task_key: lakebridge_transpile
+          notebook_task:
+            notebook_path: ../src/jobs/ai_assist.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              claude_endpoint: ${var.claude_endpoint_name}
+        - task_key: ai_code_review
+          depends_on:
+            - task_key: ai_assist_incomplete
+          notebook_task:
+            notebook_path: ../src/jobs/ai_code_review.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}
+              claude_endpoint: ${var.claude_endpoint_name}
+
+    reconcile:
+      name: migration_platform_reconcile
+      tasks:
+        - task_key: lakebridge_reconcile
+          notebook_task:
+            notebook_path: ../src/jobs/run_lakebridge_reconcile.py
+            base_parameters:
+              catalog: ${var.catalog}
+              schema: ${var.schema}

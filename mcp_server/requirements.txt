@@ -1,0 +1,3 @@
+mcp
+databricks-sql-connector
+databricks-sdk

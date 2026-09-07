@@ -1,0 +1,10 @@
+# Databricks Apps runtime config — env vars + resource requirements for the app.
+command: ["streamlit", "run", "app.py"]
+
+env:
+  - name: MIGRATION_CATALOG
+    value: "migration_platform"
+  - name: MIGRATION_SCHEMA
+    value: "core"
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: "sql_warehouse"

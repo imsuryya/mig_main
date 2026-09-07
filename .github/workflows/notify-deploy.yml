@@ -1,0 +1,21 @@
+name: Notify CI/CD Repo
+
+# This repo holds no deploy credentials or environment gates — it only tells
+# the separate migcicd repo that main moved. That repo does the actual
+# `databricks bundle deploy` (see its .github/workflows/deploy.yml).
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fire repository_dispatch to CI/CD repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CICD_REPO_PAT }}
+          repository: ${{ vars.CICD_REPO || 'imsuryya/migcicd' }}
+          event-type: platform-updated
+          client-payload: '{"ref": "${{ github.sha }}"}'

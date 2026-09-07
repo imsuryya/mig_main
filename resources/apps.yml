@@ -1,0 +1,14 @@
+# Databricks Apps for the Migration Platform: the review UI (Phase 1) and
+# the MCP server (Phase 3), deployed as two separate apps.
+
+resources:
+  apps:
+    migration_platform_app:
+      name: migration-platform
+      description: Upload / review / approve UI for migrated objects
+      source_code_path: ../app
+
+    migration_platform_mcp:
+      name: migration-platform-mcp
+      description: MCP server exposing list/diff/approve/deploy as tools
+      source_code_path: ../mcp_server

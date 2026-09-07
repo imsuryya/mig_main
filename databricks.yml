@@ -1,0 +1,43 @@
+# Databricks Asset Bundle root config for the Migration Platform.
+# Deploy with: databricks bundle deploy --target dev|staging|prod
+
+bundle:
+  name: migration_platform
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog catalog holding the platform schema
+    default: migration_platform
+  schema:
+    description: Schema holding source_objects/parsed_ir/... tables
+    default: core
+  claude_endpoint_name:
+    description: Name of the Databricks model-serving endpoint fronting Claude
+    default: claude-migration-assist
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: https://<your-workspace>.cloud.databricks.com
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/dev
+
+  staging:
+    mode: production
+    workspace:
+      host: https://<your-workspace>.cloud.databricks.com
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/staging
+    run_as:
+      service_principal_name: <staging-sp-application-id>
+
+  prod:
+    mode: production
+    workspace:
+      host: https://<your-workspace>.cloud.databricks.com
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/prod
+    run_as:
+      service_principal_name: <prod-sp-application-id>

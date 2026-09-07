@@ -1,0 +1,10 @@
+# Databricks Apps runtime config for the MCP server.
+command: ["python", "server.py"]
+
+env:
+  - name: MIGRATION_CATALOG
+    value: "migration_platform"
+  - name: MIGRATION_SCHEMA
+    value: "core"
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: "sql_warehouse"

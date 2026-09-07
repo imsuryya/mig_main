@@ -9,6 +9,11 @@ CREATE SCHEMA IF NOT EXISTS migration_platform.core;
 USE CATALOG migration_platform;
 USE SCHEMA core;
 
+-- Landing zone for uploaded source files (app/app.py) and Lakebridge output
+-- (src/jobs/*.py). Not a table, but needed before the app's first upload.
+CREATE VOLUME IF NOT EXISTS staged_sources;
+CREATE VOLUME IF NOT EXISTS generated;
+
 CREATE TABLE IF NOT EXISTS source_objects (
   object_id        STRING NOT NULL,
   source_system     STRING NOT NULL,      -- e.g. oracle, alteryx, pentaho

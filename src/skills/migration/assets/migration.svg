@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Migration to SDP">
+  <rect width="64" height="64" rx="12" fill="#1B3139"/>
+  <g fill="none" stroke="#FF6F3C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 22h14"/>
+    <path d="M14 32h14"/>
+    <path d="M14 42h14"/>
+  </g>
+  <path d="M30 32h12" stroke="#9AA7AD" stroke-width="3" stroke-linecap="round"/>
+  <path d="M38 26l8 6-8 6" fill="none" stroke="#9AA7AD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#00A972">
+    <rect x="46" y="18" width="8" height="8" rx="2"/>
+    <rect x="46" y="28" width="8" height="8" rx="2"/>
+    <rect x="46" y="38" width="8" height="8" rx="2"/>
+  </g>
+</svg>

@@ -1,8 +1,8 @@
 # Alteryx Workflow XML Structure
 
-Use this reference for structural edits to `.yxmd`, `.yxmc`, and `.yxwz` files. It covers the shared workflow XML model: documents, nodes, connections, root properties, macro/runtime properties, metadata, annotations, and containers.
+Use this reference to **parse** `.yxmd`, `.yxmc`, and `.yxwz` files during Phase 1. It covers the shared workflow XML model: documents, nodes, connections, root properties, macro/runtime properties, metadata, annotations, and containers. In this skill the XML is read-only source material — the only edit ever made is a disposable `updateMode="Full"` copy for the optional parity harness (`source-parity-harness.md`).
 
-It does not define every individual Designer tool's `Configuration` schema. For exact tool configuration XML, inspect known-good local workflows, Designer samples, installed macros, or installed tool package files.
+It does not define every individual Designer tool's `Configuration` schema. For what to extract per tool, use `tool-parse-reference.md`; for anchor and plugin names, use `designer-tool-reference.yaml`.
 
 ## Contents
 

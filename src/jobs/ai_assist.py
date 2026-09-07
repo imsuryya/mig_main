@@ -20,8 +20,17 @@ client = get_deploy_client("databricks")
 
 
 def load_skill(source_system: str, object_type: str, target_shape: str) -> str:
-    # Matches file naming in src/skills/, e.g. oracle-procedural-pyspark.md,
-    # alteryx-pyspark.md, pentaho-declarative-pipeline.md
+    # Two conventions coexist under src/skills/:
+    #   flat single-file  — e.g. oracle-procedural-pyspark.md — written as a
+    #     terse, code-only completion skill; fits this job's one-shot use.
+    #   migration/skills/<source>-to-sdp/SKILL.md — the richer *-to-sdp
+    #     family (shared Databricks/SDP target docs live once in
+    #     migration/references/, reused by every sibling skill). NOTE: these
+    #     are planning skills (their deliverable is a written migration plan,
+    #     code only as a follow-up) — built for interactive/agentic use, not
+    #     really a one-shot fill-in-the-blank call like this job makes. It's
+    #     wired in below for completeness; expect it to behave more like a
+    #     detailed design brief than a drop-in code generator here.
     candidates = [
         f"{source_system}-{object_type}-{target_shape}",
         f"{source_system}-{target_shape}",
@@ -35,13 +44,24 @@ def load_skill(source_system: str, object_type: str, target_shape: str) -> str:
         except FileNotFoundError:
             continue
         return skill + "\n\n" + load_referenced_docs(path)
+
+    sdp_path = f"../skills/migration/skills/{source_system}-to-sdp/SKILL.md"
+    try:
+        with open(sdp_path) as f:
+            skill = f.read()
+        return skill + "\n\n" + load_referenced_docs(sdp_path)
+    except FileNotFoundError:
+        pass
+
     return "Convert the source object into the target shape as faithfully as possible."
 
 
 def load_referenced_docs(skill_path: str) -> str:
-    """Skill files point at reference docs by relative path
-    (`references/<dir>/<file>.md`) — pull each one's full text in so the
-    model actually has that material, not just a pointer to it."""
+    """Skill files point at reference docs by relative path — either
+    skill-local (`references/<dir>/<file>.md`) or, for the *-to-sdp family,
+    shared docs one level up (`../../references/<file>.md`). Pull each one's
+    full text in so the model actually has that material, not just a
+    pointer to it."""
     import os as _os
     import re
 
@@ -49,11 +69,11 @@ def load_referenced_docs(skill_path: str) -> str:
         text = f.read()
 
     skill_dir = _os.path.dirname(skill_path)
-    doc_paths = sorted(set(re.findall(r"`(references/[\w./-]+\.md)`", text)))
+    doc_paths = sorted(set(re.findall(r"`((?:\.\./)*references/[\w./-]+\.md)`", text)))
 
     sections = []
     for rel_path in doc_paths:
-        full_path = _os.path.join(skill_dir, rel_path)
+        full_path = _os.path.normpath(_os.path.join(skill_dir, rel_path))
         try:
             with open(full_path) as f:
                 sections.append(f"## Reference: {rel_path}\n\n{f.read()}")

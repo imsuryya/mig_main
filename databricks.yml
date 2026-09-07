@@ -14,9 +14,9 @@ variables:
   schema:
     description: Schema holding source_objects/parsed_ir/... tables
     default: core
-  claude_endpoint_name:
-    description: Name of the Databricks model-serving endpoint fronting Claude
-    default: claude-migration-assist
+  ai_endpoint_name:
+    description: Name of the Databricks model-serving endpoint fronting the AI-assist/review LLM (Gemini)
+    default: gemini-migration-assist
 
 targets:
   dev:

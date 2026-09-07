@@ -40,14 +40,13 @@ No manual copy-pasting needed past this point — `bundle deploy` reads `databri
 
 | What | Where | Phase |
 |---|---|---|
-| Anthropic API key | `databricks secrets create-scope migration-platform` then `databricks secrets put-secret migration-platform anthropic-key` | Phase 0 step 5 |
-| Claude model-serving endpoint | Serving → Create serving endpoint, provider `anthropic`, name matches `claude_endpoint_name` in `databricks.yml` (`claude-migration-assist`) | Phase 0 step 5 |
+| Gemini API key | `databricks secrets create-scope migration-platform` then `databricks secrets put-secret migration-platform gemini-api-key` — **never paste the raw key in chat, a doc, or a commit; only into this command or the UI's secret field** | Phase 0 step 5 |
+| Gemini model-serving endpoint | Serving → Create serving endpoint → **Custom Provider** (OpenAI-compatible), base URL `https://generativelanguage.googleapis.com/v1beta/openai/`, Bearer token = `{{secrets/migration-platform/gemini-api-key}}`, model e.g. `gemini-2.5-flash`. Name it to match `ai_endpoint_name` in `databricks.yml` (`gemini-migration-assist`). A Google AI Studio key uses this Custom Provider path, not the Vertex AI provider (that one needs a GCP service-account key instead) — [Databricks docs](https://docs.databricks.com/aws/en/machine-learning/model-serving/query-gemini-api) | Phase 0 step 5 |
 | SQL warehouse for the app | App's Settings → Resources tab (after first `apps deploy`), bind a warehouse so `DATABRICKS_HTTP_PATH` in `app.yaml` resolves | Phase 1 step 5 |
 
-## CI/CD — not pasted anywhere, lives in GitHub
+## CI/CD — split across two repos, see CICD.md
 
-| File | Where it runs | Trigger |
-|---|---|---|
-| `.github/workflows/cicd.yml` | GitHub Actions, this repo | Push to `main` → deploy `dev`. Manual `workflow_dispatch` → deploy `staging`/`prod`, gated by required reviewers on those GitHub Environments |
-
-Required repo secrets: `DATABRICKS_HOST`, `DATABRICKS_TOKEN` (or switch to OIDC + service principal for staging/prod, matching the `run_as` service principals already set in `databricks.yml`).
+This repo (`mig_main`) only fires a `repository_dispatch` on push to `main`
+via `.github/workflows/notify-deploy.yml`. The actual `databricks bundle
+deploy` runs in the separate `migcicd` repo. See [CICD.md](CICD.md) for the
+full setup.

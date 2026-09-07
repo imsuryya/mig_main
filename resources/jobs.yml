@@ -41,7 +41,7 @@ resources:
             base_parameters:
               catalog: ${var.catalog}
               schema: ${var.schema}
-              claude_endpoint: ${var.claude_endpoint_name}
+              ai_endpoint: ${var.ai_endpoint_name}
         - task_key: ai_code_review
           depends_on:
             - task_key: ai_assist_incomplete
@@ -50,7 +50,7 @@ resources:
             base_parameters:
               catalog: ${var.catalog}
               schema: ${var.schema}
-              claude_endpoint: ${var.claude_endpoint_name}
+              ai_endpoint: ${var.ai_endpoint_name}
 
     reconcile:
       name: migration_platform_reconcile

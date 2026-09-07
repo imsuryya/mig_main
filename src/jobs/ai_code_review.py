@@ -1,15 +1,15 @@
 # Databricks notebook source
-# Phase 2 — AI code-review task: independent Claude call comparing source
+# Phase 2 — AI code-review task: independent Gemini call comparing source
 # logic to generated code, producing the confidence_note that drives the
 # "yellow flag" in the review app.
 
 dbutils.widgets.text("catalog", "migration_platform")
 dbutils.widgets.text("schema", "core")
-dbutils.widgets.text("claude_endpoint", "claude-migration-assist")
+dbutils.widgets.text("ai_endpoint", "gemini-migration-assist")
 
 catalog = dbutils.widgets.get("catalog")
 schema = dbutils.widgets.get("schema")
-endpoint = dbutils.widgets.get("claude_endpoint")
+endpoint = dbutils.widgets.get("ai_endpoint")
 
 from mlflow.deployments import get_deploy_client
 

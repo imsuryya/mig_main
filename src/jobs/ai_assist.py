@@ -1,6 +1,6 @@
 # Databricks notebook source
 # Phase 2 — AI-assist task: for objects Lakebridge flagged incomplete, call
-# the governed Claude model-serving endpoint with the matching migration
+# the governed Gemini model-serving endpoint with the matching migration
 # skill (versioned files under src/skills/).
 
 import uuid
@@ -8,11 +8,11 @@ from datetime import datetime, timezone
 
 dbutils.widgets.text("catalog", "migration_platform")
 dbutils.widgets.text("schema", "core")
-dbutils.widgets.text("claude_endpoint", "claude-migration-assist")
+dbutils.widgets.text("ai_endpoint", "gemini-migration-assist")
 
 catalog = dbutils.widgets.get("catalog")
 schema = dbutils.widgets.get("schema")
-endpoint = dbutils.widgets.get("claude_endpoint")
+endpoint = dbutils.widgets.get("ai_endpoint")
 
 from mlflow.deployments import get_deploy_client
 

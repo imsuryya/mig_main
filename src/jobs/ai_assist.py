@@ -20,18 +20,46 @@ client = get_deploy_client("databricks")
 
 
 def load_skill(source_system: str, object_type: str, target_shape: str) -> str:
-    # Matches file naming in src/skills/, e.g. oracle-procedural-pyspark.md
+    # Matches file naming in src/skills/, e.g. oracle-procedural-pyspark.md,
+    # alteryx-pyspark.md, pentaho-declarative-pipeline.md
     candidates = [
         f"{source_system}-{object_type}-{target_shape}",
+        f"{source_system}-{target_shape}",
         f"{source_system}-procedural-{target_shape}" if object_type == "stored_procedure" else None,
     ]
     for name in filter(None, candidates):
+        path = f"../skills/{name}.md"
         try:
-            with open(f"../skills/{name}.md") as f:
-                return f.read()
+            with open(path) as f:
+                skill = f.read()
         except FileNotFoundError:
             continue
+        return skill + "\n\n" + load_referenced_docs(path)
     return "Convert the source object into the target shape as faithfully as possible."
+
+
+def load_referenced_docs(skill_path: str) -> str:
+    """Skill files point at reference docs by relative path
+    (`references/<dir>/<file>.md`) — pull each one's full text in so the
+    model actually has that material, not just a pointer to it."""
+    import os as _os
+    import re
+
+    with open(skill_path) as f:
+        text = f.read()
+
+    skill_dir = _os.path.dirname(skill_path)
+    doc_paths = sorted(set(re.findall(r"`(references/[\w./-]+\.md)`", text)))
+
+    sections = []
+    for rel_path in doc_paths:
+        full_path = _os.path.join(skill_dir, rel_path)
+        try:
+            with open(full_path) as f:
+                sections.append(f"## Reference: {rel_path}\n\n{f.read()}")
+        except FileNotFoundError:
+            print(f"Warning: {skill_path} references missing doc {rel_path}")
+    return "\n\n".join(sections)
 
 
 def ai_complete(source_system: str, object_type: str, target_shape: str, ir_payload: str, generated_code: str) -> str:
